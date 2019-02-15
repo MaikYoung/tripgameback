@@ -25,7 +25,7 @@ SECRET_KEY = '5l#c31j1aw4lrqg8&ts)uzs+fx-)-)q*c%l7%4pmts4u^f+fu4'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['0.0.0.0']
 
 
 # Application definition
@@ -37,6 +37,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    #thirdapps
+    'rest_framework',
+    #myapps
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -75,8 +79,12 @@ WSGI_APPLICATION = 'project.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'tripgame',
+        'USER': 'mike',
+        'PASSWORD': '12345',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
@@ -99,6 +107,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = "users.User"
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
@@ -118,3 +127,21 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+#APP'S PROJECT SETTINGS
+
+LEVELS = (
+    ('0', 'New'),
+    ('1', 'Noob'),
+    ('2', 'Begginer'),
+    ('3', 'Junior'),
+    ('4', 'Sophomore'),
+    ('5', 'Intermediate'),
+    ('6', 'Backpacker'),
+    ('7', 'Advanced'),
+    ('8', 'High Authority'),
+    ('9', 'Master'),
+    ('10', 'True Traveller'),
+)
+
