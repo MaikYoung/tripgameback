@@ -17,6 +17,4 @@ class User(AbstractUser):
     trip_level = models.CharField(max_length=2, choices=LEVELS, default=0)
     based_on = models.CharField(max_length=50, blank=True, null=True)
 
-    def get_username(self):
-        return self.username
 
