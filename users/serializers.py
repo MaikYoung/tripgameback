@@ -47,3 +47,11 @@ class UserCreateSerializer(serializers.Serializer):
         instance.save()
         return instance
 
+
+class UserUploadProfilePicSerializer(serializers.Serializer):
+    profile_pic = serializers.ImageField()
+
+    def update(self, instance, validated_data):
+        instance.profile_pic = validated_data.get('file', instance.profile_pic)
+        instance.save()
+        return instance

@@ -1,10 +1,11 @@
 from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.generics import get_object_or_404
+from rest_framework.parsers import FileUploadParser, MultiPartParser, FormParser
 from rest_framework.views import APIView
 
 from users.models import User
-from users.serializers import UserSerializer, UserDetailSerializer, UserCreateSerializer
+from users.serializers import UserSerializer, UserDetailSerializer, UserCreateSerializer, UserUploadProfilePicSerializer
 
 
 class ListUsers(APIView):
@@ -53,3 +54,18 @@ class DetailUser(APIView):
         else:
             response = 'Not Authorized'
             return JsonResponse(response, status=status.HTTP_403_FORBIDDEN, safe=False)
+
+
+class UploadProfilePic(APIView):
+    queryset = User.objects.all()
+    parser_classes = (MultiPartParser, FormParser)
+
+    def put(self, request, pk, format=None):
+        user = get_object_or_404(queryset=self.queryset, id=pk)
+        image = request.data
+        serializer = UserUploadProfilePicSerializer(instance=user, data=image, partial=True)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
+        else:
+            return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST, safe=False)
