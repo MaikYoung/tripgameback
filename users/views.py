@@ -44,6 +44,12 @@ class DetailUser(APIView):
             return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST, safe=False)
 
     def delete(self, request, pk):
-        user = get_object_or_404(queryset=self.queryset, pk=pk)
-        user.delete()
-        return JsonResponse({"message": "Article with id `{}` has been deleted.".format(pk)}, status=204)
+        # TODO: Mirar por que 'ConnectionResetError: [Errno 104] Connection reset by peer' despues de borrar un user
+        if request.user.is_superuser:
+            user = get_object_or_404(queryset=self.queryset, id=pk)
+            user.delete()
+            response = 'User deleted correctly'
+            return JsonResponse(response, status=status.HTTP_204_NO_CONTENT, safe=False)
+        else:
+            response = 'Not Authorized'
+            return JsonResponse(response, status=status.HTTP_403_FORBIDDEN, safe=False)
