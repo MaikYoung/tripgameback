@@ -49,9 +49,9 @@ class UserCreateSerializer(serializers.Serializer):
 
 
 class UserUploadProfilePicSerializer(serializers.Serializer):
-    profile_pic = serializers.ImageField()
+    profile_pic = serializers.URLField()
 
     def update(self, instance, validated_data):
-        instance.profile_pic = validated_data.get('file', instance.profile_pic)
+        instance.profile_pic = validated_data.get('profile_pic', instance.profile_pic)
         instance.save()
         return instance
