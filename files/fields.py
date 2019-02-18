@@ -11,7 +11,7 @@ class Base64FileField(serializers.FileField):
             format, imgstr = data.split(';base64,')
             ext = format.split('/')[-1]
             id = uuid.uuid4()
-            data = ContentFile(base64.b64decode(imgstr), name = id.urn[9:] + '.' + ext)
+            data = ContentFile(base64.b64decode(imgstr), name=id.urn[9:] + '.' + ext)
         return super(Base64FileField, self).to_internal_value(data)
 
     def to_representation(self, value):
