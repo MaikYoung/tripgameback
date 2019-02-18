@@ -5,14 +5,15 @@ from users.models import User
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'username', 'trip_level', 'based_on')
+        fields = ('id', 'username', 'trip_level', 'based_on', 'profile_pic')
 
 
 class UserDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
-            'id', 'username', 'first_name', 'last_name', 'trip_level', 'based_on', 'description', 'birthday'
+            'id', 'username', 'first_name', 'last_name', 'trip_level', 'based_on', 'description',
+            'birthday', 'profile_pic'
         )
 
 
@@ -47,3 +48,11 @@ class UserCreateSerializer(serializers.Serializer):
         instance.save()
         return instance
 
+
+class UserUploadProfilePicSerializer(serializers.Serializer):
+    profile_pic = serializers.URLField()
+
+    def update(self, instance, validated_data):
+        instance.profile_pic = validated_data.get('profile_pic', instance.profile_pic)
+        instance.save()
+        return instance

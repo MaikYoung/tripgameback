@@ -16,5 +16,6 @@ class User(AbstractUser):
     birthday = models.DateField(blank=True, null=True)
     trip_level = models.CharField(max_length=2, choices=LEVELS, default=0)
     based_on = models.CharField(max_length=50, blank=True, null=True)
+    profile_pic = models.URLField(blank=True, null=True)
 
 
