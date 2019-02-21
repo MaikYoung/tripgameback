@@ -3,6 +3,8 @@ from rest_framework import status
 from rest_framework.generics import get_object_or_404
 from rest_framework.views import APIView
 
+from notifications.models import Notification
+from project.settings import NOTIFICATION_TYPES
 from users.models import User
 from users.serializers import UserSerializer, UserDetailSerializer, UserCreateSerializer, UserUploadProfilePicSerializer
 
@@ -26,7 +28,7 @@ class DetailUser(APIView):
     queryset = User.objects.all()
 
     def get(self, request, pk):
-        user = User.objects.filter(id=pk)
+        user = get_object_or_404(queryset=self.queryset, id=pk)
         if user:
             serializer = UserDetailSerializer(user, many=True)
             return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
@@ -66,3 +68,16 @@ class UploadProfilePic(APIView):
             return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
         else:
             return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST, safe=False)
+
+
+class UserFollowers(APIView):
+    queryset = User.objects.all()
+
+    def post(self, request, to_user):
+        user = get_object_or_404(queryset=self.queryset, id=to_user)
+        user.followers.append(request.user)
+        user.save()
+        Notification.create_notification(
+            from_user=request.user, to_user=to_user, type=NOTIFICATION_TYPES[0], extra_info=None
+        )
+        return JsonResponse(user, status=status.HTTP_200_OK)
