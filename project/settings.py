@@ -159,7 +159,7 @@ LEVELS = (
 )
 
 NOTIFICATION_TYPES = (
-    ('1', 'new follow'),
+    ('1', 'new follower'),
     ('2', 'new comment'),
     ('3', 'upgrade_level'),
     ('4', 'trip_verification'),
