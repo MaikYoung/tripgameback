@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AbstractUser
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from project.settings import LEVELS
 
@@ -17,5 +18,7 @@ class User(AbstractUser):
     trip_level = models.CharField(max_length=2, choices=LEVELS, default=0)
     based_on = models.CharField(max_length=50, blank=True, null=True)
     profile_pic = models.URLField(blank=True, null=True)
+    following = ArrayField(models.IntegerField(), null=True)
+    followers = ArrayField(models.IntegerField(), null=True)
 
 
