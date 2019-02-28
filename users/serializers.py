@@ -13,7 +13,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
         model = User
         fields = (
             'id', 'username', 'first_name', 'last_name', 'trip_level', 'based_on', 'description',
-            'birthday', 'profile_pic'
+            'birthday', 'profile_pic', 'followers', 'following'
         )
 
 
