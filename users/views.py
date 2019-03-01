@@ -11,6 +11,9 @@ from users.serializers import UserSerializer, UserDetailSerializer, UserCreateSe
 
 
 class ListUsers(APIView):
+    """
+    Users List and Create Users
+    """
     def get(self, request):
         users = User.objects.all()
         serializer = UserSerializer(users, many=True)
@@ -26,6 +29,9 @@ class ListUsers(APIView):
 
 
 class DetailUser(APIView):
+    """
+    Usr detail, update user and delete user
+    """
     queryset = User.objects.all()
 
     def get(self, request, pk):
@@ -59,6 +65,9 @@ class DetailUser(APIView):
 
 
 class UploadProfilePic(APIView):
+    """
+    Uploadd url to profile_pic of the user
+    """
     queryset = User.objects.all()
 
     def put(self, request):
