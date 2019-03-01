@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     #myapps
     'users',
     'notifications',
+    'trips'
 ]
 
 MIDDLEWARE = [
