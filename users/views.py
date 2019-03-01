@@ -5,6 +5,8 @@ from rest_framework import status
 from rest_framework.generics import get_object_or_404
 from rest_framework.views import APIView
 
+from notifications.models import Notification
+from project.settings import NOTIFICATION_TYPES
 from users.models import User
 from users.serializers import UserSerializer, UserDetailSerializer, UserCreateSerializer, \
     UserUploadProfilePicSerializer
@@ -34,14 +36,10 @@ class DetailUser(APIView):
     """
     queryset = User.objects.all()
 
-    def get(self, request, pk):
-        user = User.objects.filter(id=pk)
-        if user:
-            serializer = UserDetailSerializer(user, many=True)
-            return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
-        else:
-            response = 'User does not exit'
-            return JsonResponse(response, status=status.HTTP_404_NOT_FOUND, safe=False)
+    def get(self, request):
+        user = get_object_or_404(queryset=self.queryset, id=request.user.id)
+        serializer = UserDetailSerializer(user)
+        return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
     def put(self, request, pk):
         user = get_object_or_404(queryset=self.queryset, id=request.user.id)

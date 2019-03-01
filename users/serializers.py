@@ -56,3 +56,14 @@ class UserUploadProfilePicSerializer(serializers.Serializer):
         instance.profile_pic = validated_data.get('profile_pic', instance.profile_pic)
         instance.save()
         return instance
+
+
+class UserFollowersSerializer(serializers.Serializer):
+    following = serializers.ListField(child=serializers.IntegerField())
+    followers = serializers.ListField(child=serializers.IntegerField())
+
+    def update(self, instance, validated_data):
+        instance.following = validated_data.get('following', instance.following)
+        instance.followers = validated_data.get('followers', instance.followers)
+        instance.save()
+        return instance

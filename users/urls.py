@@ -1,5 +1,6 @@
 from django.urls import path, include
 
+
 from users.views import ListUsers, DetailUser, UploadProfilePic, UserAddFollowing, UserDeleteFollowing
 
 urlpatterns = [

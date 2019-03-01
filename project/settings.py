@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     #myapps
     'users',
+    'notifications',
 ]
 
 MIDDLEWARE = [
@@ -155,5 +156,14 @@ LEVELS = (
     ('8', 'High Authority'),
     ('9', 'Master'),
     ('10', 'True Traveller'),
+)
+
+NOTIFICATION_TYPES = (
+    ('1', 'new follower'),
+    ('2', 'new comment'),
+    ('3', 'upgrade_level'),
+    ('4', 'trip_verification'),
+    ('5', 'trusted_trip'),
+    ('6', 'fake_trip'),
 )
 
