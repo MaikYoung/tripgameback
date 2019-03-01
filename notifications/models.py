@@ -13,5 +13,8 @@ class Notification(models.Model):
     active = models.BooleanField(default=True)
     create_date = models.DateField(auto_now_add=True)
 
+    def create_notification(self, notice):
+        pass
+
 
 
