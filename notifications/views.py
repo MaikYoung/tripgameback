@@ -12,9 +12,3 @@ class NotificationList(APIView):
         notification = Notification.objects.filter(to_user=request.user, active=True)
         serializer = NotificationSerializer(notification, many=True)
         return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
-
-    def post(self, request):
-        serializer = CreateNotificationSerializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-        return JsonResponse(status=status.HTTP_200_OK)
