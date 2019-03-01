@@ -1,7 +1,8 @@
 from django.urls import path, include
 
 
-from users.views import ListUsers, DetailUser, UploadProfilePic, UserAddFollowing, UserDeleteFollowing
+from users.views import ListUsers, DetailUser, UploadProfilePic, UserAddFollowing, UserDeleteFollowing, \
+    UserDeleteFollower
 
 urlpatterns = [
     path(r'v1/users', ListUsers.as_view()),
@@ -10,4 +11,5 @@ urlpatterns = [
     path(r'v1/user/uploadimage', UploadProfilePic.as_view()),
     path(r'v1/user/addfollowing/<int:pk>', UserAddFollowing.as_view()),
     path(r'v1/user/deletefollowing/<int:pk>', UserDeleteFollowing.as_view()),
+    path(r'v1/user/deletefollower/<int:pk>', UserDeleteFollower.as_view())
 ]

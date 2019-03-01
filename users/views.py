@@ -34,7 +34,7 @@ class DetailUser(APIView):
     queryset = User.objects.all()
 
     def get(self, request, pk):
-        user = get_object_or_404(queryset=self.queryset, id=request.user.id)
+        user = get_object_or_404(queryset=self.queryset, id=pk)
         serializer = UserDetailSerializer(user)
         return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
@@ -135,4 +135,33 @@ class UserDeleteFollowing(APIView):
                     return JsonResponse(data=response, status=status.HTTP_400_BAD_REQUEST, safe=False)
             else:
                 response = 'User is not in the following list'
+                return JsonResponse(data=response, status=status.HTTP_400_BAD_REQUEST, safe=False)
+
+
+class UserDeleteFollower(APIView):
+    """
+    Delete user from followers list
+    """
+    queryset = User.objects.all()
+
+    def post(self, request, pk):
+        from_user = get_object_or_404(queryset=self.queryset, id=request.user.id)
+        target_user = get_object_or_404(queryset=self.queryset, id=pk)
+        if from_user:
+            if pk in from_user.followers:
+                from_user.followers.remove(pk)
+                from_user.save()
+                delete_follower = True
+                if target_user and delete_follower:
+                    target_user.following.remove(request.user.id)
+                    target_user.save()
+                    delete_following = True
+                    if delete_follower and delete_following:
+                        response = True
+                        return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
+                else:
+                    response = 'User is not in the following list'
+                    return JsonResponse(data=response, status=status.HTTP_400_BAD_REQUEST, safe=False)
+            else:
+                response = 'User is not in the follower list'
                 return JsonResponse(data=response, status=status.HTTP_400_BAD_REQUEST, safe=False)
