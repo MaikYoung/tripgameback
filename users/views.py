@@ -1,12 +1,9 @@
-import json
-
 from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.generics import get_object_or_404
 from rest_framework.views import APIView
 
 from notifications.models import Notification
-from project.settings import NOTIFICATION_TYPES
 from users.models import User
 from users.serializers import UserSerializer, UserDetailSerializer, UserCreateSerializer, \
     UserUploadProfilePicSerializer
@@ -36,12 +33,12 @@ class DetailUser(APIView):
     """
     queryset = User.objects.all()
 
-    def get(self, request):
+    def get(self, request, pk):
         user = get_object_or_404(queryset=self.queryset, id=request.user.id)
         serializer = UserDetailSerializer(user)
         return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
-    def put(self, request, pk):
+    def put(self, request):
         user = get_object_or_404(queryset=self.queryset, id=request.user.id)
         serializer = UserCreateSerializer(instance=user, data=request.data, partial=True)
         if serializer.is_valid(raise_exception=True):
@@ -64,7 +61,7 @@ class DetailUser(APIView):
 
 class UploadProfilePic(APIView):
     """
-    Uploadd url to profile_pic of the user
+    Upload url to profile_pic of the user
     """
     queryset = User.objects.all()
 
@@ -105,6 +102,8 @@ class UserAddFollowing(APIView):
                         add_follower = True
         if add_following and add_follower:
             response = True
+            # notification to target user new follower
+            Notification.create_notification(to_user=target_user, from_user=request.user.id, type='1')
             return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
         else:
             return JsonResponse(status=status.HTTP_400_BAD_REQUEST)
