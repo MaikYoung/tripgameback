@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 
 from notifications.models import Notification
-from notifications.serializers import NotificationSerializer, CreateNotificationSerializer
+from notifications.serializers import NotificationSerializer
 
 
 class NotificationList(APIView):
