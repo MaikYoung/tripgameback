@@ -60,8 +60,27 @@ class AddTripMate(APIView):
                 )
                 serializer = TripDetailSerializer(trip)
                 return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
+        else:
+            response = 'Not Authorized'
+            return JsonResponse(response, status=status.HTTP_401_UNAUTHORIZED, safe=False)
 
 
 class DeleteTripMate(APIView):
-    pass
+    queryset = User.objects.all()
 
+    def post(self, request, pk, user):
+        trip_owner = get_object_or_404(queryset=self.queryset, id=request.user.id)
+        trip_mate = get_object_or_404(queryset=self.queryset, id=user)
+        trip = get_object_or_404(Trip.objects.all(), id=pk)
+        if trip_owner.id == trip.owner.id:
+            if trip_mate.id in trip.mates:
+                trip.mates.remove(trip_mate.id)
+                trip.save()
+                serializer = TripDetailSerializer(trip)
+                return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
+            else:
+                response = 'User is not a trip mate'
+                return JsonResponse(response, status=status.HTTP_400_BAD_REQUEST, safe=False)
+        else:
+            response = 'Not Authorized'
+            return JsonResponse(response, status=status.HTTP_401_UNAUTHORIZED, safe=False)
