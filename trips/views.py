@@ -5,6 +5,7 @@ from rest_framework import status
 from rest_framework.generics import get_object_or_404
 from rest_framework.views import APIView
 
+from notifications.models import Notification
 from trips.models import Trip
 from trips.serializers import TripSerializer, TripDetailSerializer, CreateTripSerializer
 from users.models import User
@@ -12,7 +13,7 @@ from users.models import User
 
 class TripList(APIView):
     def get(self, request):
-        trips = Trip.objects.all().order_by()
+        trips = Trip.objects.all().order_by('-create_at')
         serializer = TripSerializer(trips, many=True)
         return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
@@ -54,6 +55,9 @@ class AddTripMate(APIView):
             else:
                 trip.mates.append(trip_mate.id)
                 trip.save()
+                Notification.create_notification(
+                    to_user=trip_mate, from_user=trip_owner.id, type='7', trip_related=trip.id
+                )
                 serializer = TripDetailSerializer(trip)
                 return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 

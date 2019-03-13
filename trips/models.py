@@ -21,7 +21,7 @@ class Trip(models.Model):
     views = models.IntegerField(default=0)
     date_start = models.DateField(null=True)
     date_end = models.DateField(null=True)
-    #TODO: add create_at to make order_by last created on top
+    create_at = models.DateTimeField(auto_now=True)
 
     @staticmethod
     def create_trip(obj , user):
@@ -38,7 +38,7 @@ class Trip(models.Model):
             return response
         trip.date_end = date_end
         from_to = validate_from_to(obj.get('from_to'))
-        if from_to  == 'error':
+        if from_to == 'error':
             response = 'City from_to can\'t be found'
             return response
         trip.from_to = from_to
