@@ -9,6 +9,6 @@ from notifications.serializers import NotificationSerializer
 class NotificationList(APIView):
 
     def get(self, request):
-        notification = Notification.objects.filter(to_user=request.user, active=True)
+        notification = Notification.objects.filter(to_user=request.user.id, active=True)
         serializer = NotificationSerializer(notification, many=True)
         return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
