@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+from geopy import Nominatim
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -43,6 +45,7 @@ INSTALLED_APPS = [
     #myapps
     'users',
     'notifications',
+    'trips'
 ]
 
 MIDDLEWARE = [
@@ -159,11 +162,16 @@ LEVELS = (
 )
 
 NOTIFICATION_TYPES = (
-    ('0', 'new follower'),
-    ('1', 'new comment'),
+    ('0', 'new_follower'),
+    ('1', 'new_comment'),
     ('2', 'upgrade_level'),
     ('3', 'trip_verification'),
     ('4', 'trusted_trip'),
     ('5', 'fake_trip'),
+    ('6', 'added_to_tirp')
 )
+
+
+#Geolocator
+geolocator = Nominatim(user_agent="travlin")
 

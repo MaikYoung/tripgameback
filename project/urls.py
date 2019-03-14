@@ -21,4 +21,5 @@ urlpatterns = [
     path('api/', include('users.urls')),
     path('api/', include('files.urls')),
     path('api/', include('notifications.urls')),
+    path('api/', include('trips.urls')),
 ]
