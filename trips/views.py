@@ -1,4 +1,5 @@
-import json
+
+
 
 from django.http import JsonResponse
 from rest_framework import status
@@ -39,6 +40,17 @@ class TripDetail(APIView):
         serializer = TripDetailSerializer(trip)
         Trip.new_visit(trip=trip)
         return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
+
+    def put(self, request, pk):
+        trip = get_object_or_404(queryset=self.queryset, id=pk)
+        serializer = CreateTripSerializer(instance=trip, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            returned_serializer = TripDetailSerializer(serializer.instance)
+            return JsonResponse(returned_serializer.data, status=status.HTTP_200_OK, safe=False)
+        else:
+            #TODO: resolver la devolucion de errores!
+            return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST, safe=False)
 
 
 class AddTripMate(APIView):
@@ -81,6 +93,55 @@ class DeleteTripMate(APIView):
             else:
                 response = 'User is not a trip mate'
                 return JsonResponse(response, status=status.HTTP_400_BAD_REQUEST, safe=False)
+        else:
+            response = 'Not Authorized'
+            return JsonResponse(response, status=status.HTTP_401_UNAUTHORIZED, safe=False)
+
+
+class UploadPictureTrip(APIView):
+    queryset = Trip.objects.all()
+
+    def post(self, request, pk):
+        trip = get_object_or_404(self.queryset, id=pk)
+        owner = get_object_or_404(User.objects.all(), id=request.user.id)
+        if owner.id == trip.owner.id:
+            if len(trip.pictures) > 4:  # es una cuenta con 0 el primero
+                response = '5 pictures is the limit'
+                return JsonResponse(response, status=status.HTTP_400_BAD_REQUEST, safe=False)
+            else:
+                image = request.data.get('image', None)
+                if image is not None:
+                    trip.pictures.append(image)
+                    trip.save()
+                    returned_trip = get_object_or_404(self.queryset, id=trip.id)
+                    serializer = TripDetailSerializer(returned_trip)
+                    return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
+                else:
+                    response = 'Image is None'
+                    return JsonResponse(response, status=status.HTTP_400_BAD_REQUEST, safe=False)
+        else:
+            response = 'Not Authorized'
+            return JsonResponse(response, status=status.HTTP_401_UNAUTHORIZED, safe=False)
+
+
+class DeletePictureTrip(APIView):
+    queryset = Trip.objects.all()
+
+    def delete(self, request, pk, index):
+        trip = get_object_or_404(self.queryset, id=pk)
+        owner = get_object_or_404(User.objects.all(), id=request.user.id)
+        if owner.id == trip.owner.id:
+            if len(trip.pictures) == 0:
+                response = 'No pictures to delete'
+                return JsonResponse(response, status=status.HTTP_400_BAD_REQUEST, safe=False)
+            else:
+                for i, data in enumerate(trip.pictures):
+                    if index == i:
+                        trip.pictures.remove(data)
+                        trip.save()
+                        returned_trip = get_object_or_404(self.queryset, id=trip.id)
+                        serializer = TripDetailSerializer(returned_trip)
+                        return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
         else:
             response = 'Not Authorized'
             return JsonResponse(response, status=status.HTTP_401_UNAUTHORIZED, safe=False)
