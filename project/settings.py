@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     #myapps
     'users',
     'notifications',
-    'trips'
+    'trips',
+    'points',
 ]
 
 MIDDLEWARE = [

@@ -7,6 +7,7 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.views import APIView
 
 from notifications.models import Notification
+from points.models import Point
 from trips.models import Trip
 from trips.serializers import TripSerializer, TripDetailSerializer, CreateTripSerializer
 from users.models import User
@@ -25,6 +26,7 @@ class TripList(APIView):
             if isinstance(trip, str):
                 return JsonResponse(trip, status=status.HTTP_400_BAD_REQUEST, safe=False)
             else:
+                Point.calculate_points_by_trip_kms(trip.kms)
                 serializer = TripDetailSerializer(trip)
                 return JsonResponse(serializer.data, status=status.HTTP_201_CREATED, safe=False)
         else:
