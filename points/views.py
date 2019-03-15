@@ -13,15 +13,17 @@ class PointsUserDetail(APIView):
         point = get_object_or_404(Point.objects.all(), owner=request.user.id)
         trips = Trip.objects.filter(owner=request.user.id)
         list_kms = []
+        list_points = []
         for trip in trips:
             if trip.verified is True:
                 list_kms.append(trip.kms)
+                list_points.append(trip.points)
         total_kms = sum(list_kms)
         if total_kms != point.total_kms:
             point.total_kms = total_kms
-            point.save()
-            serializer = PointDetailSerializer(point)
-            return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
-        else:
-            serializer = PointDetailSerializer(point)
-            return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
+        total_points = sum(list_points)
+        if total_points != point.points:
+            point.points = total_points
+        point.save()
+        serializer = PointDetailSerializer(point)
+        return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
