@@ -15,7 +15,7 @@ class Trip(models.Model):
     from_to = models.CharField(max_length=100)
     pictures = ArrayField(models.URLField(blank=True, null=True), default=list, size=8, blank=True)
     verified = models.BooleanField(default=False)
-    counter_verified = models.IntegerField(default=0)
+    verified_by = ArrayField(models.IntegerField(), default=list)
     kms = models.IntegerField()
     route = models.TextField(blank=True)
     views = models.IntegerField(default=0)

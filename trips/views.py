@@ -147,3 +147,33 @@ class DeletePictureTrip(APIView):
         else:
             response = 'Not Authorized'
             return JsonResponse(response, status=status.HTTP_401_UNAUTHORIZED, safe=False)
+
+
+class VerifyTrip(APIView):
+    queryset = Trip.objects.all()
+
+    def post(self, request, pk):
+        trip = get_object_or_404(self.queryset, id=pk)
+        user = get_object_or_404(User.objects.all(), id=request.user.id)
+        if trip.owner.id == user.id:
+            response = 'Can\'t verify your own trip'
+            return JsonResponse(response, status=status.HTTP_401_UNAUTHORIZED, safe=False)
+        elif user.id in trip.mates:
+            response = 'Can\'t verify a trip if you are a mate'
+            return JsonResponse(response, status=status.HTTP_401_UNAUTHORIZED, safe=False)
+        else:
+            if user.id in trip.verified_by:
+                response = 'Can\'t verify a trip twice'
+                return JsonResponse(response, status=status.HTTP_401_UNAUTHORIZED, safe=False)
+            else:
+                if len(trip.verified_by) < 2:
+                    trip.verified_by.append(user.id)
+                    trip.verified = True if len(trip.verified_by) == 2 else False
+                    trip.save()
+                    returned_trip = get_object_or_404(self.queryset, id=trip.id)
+                    serializer = TripDetailSerializer(returned_trip)
+                    return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
+                else:
+                    response = 'Trip is already verified'
+                    return JsonResponse(response, status=status.HTTP_400_BAD_REQUEST, safe=False)
+
