@@ -69,6 +69,7 @@ class AddTripMate(APIView):
             else:
                 trip.mates.append(trip_mate.id)
                 trip.save()
+                trip_mate.points = trip_mate.points + (trip.points / 2)
                 Notification.create_notification(
                     to_user=trip_mate, from_user=trip_owner.id, type='7', trip_related=trip.id
                 )
@@ -89,6 +90,7 @@ class DeleteTripMate(APIView):
         if trip_owner.id == trip.owner.id:
             if trip_mate.id in trip.mates:
                 trip.mates.remove(trip_mate.id)
+                trip_mate.points = trip_mate.points - (trip.points / 2)
                 trip.save()
                 serializer = TripDetailSerializer(trip)
                 return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
@@ -171,6 +173,7 @@ class VerifyTrip(APIView):
                 if len(trip.verified_by) < 2:
                     trip.verified_by.append(user.id)
                     trip.verified = True if len(trip.verified_by) == 2 else False
+                    user.points = user.points + 5
                     trip.save()
                     returned_trip = get_object_or_404(self.queryset, id=trip.id)
                     serializer = TripDetailSerializer(returned_trip)
