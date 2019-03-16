@@ -174,6 +174,7 @@ class VerifyTrip(APIView):
                     trip.verified_by.append(user.id)
                     trip.verified = True if len(trip.verified_by) == 2 else False
                     user.points = user.points + 5
+                    user.save()
                     trip.save()
                     returned_trip = get_object_or_404(self.queryset, id=trip.id)
                     serializer = TripDetailSerializer(returned_trip)
