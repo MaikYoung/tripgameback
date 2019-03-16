@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'notifications',
     'trips',
     'points',
+    'tripcomments',
 ]
 
 MIDDLEWARE = [
