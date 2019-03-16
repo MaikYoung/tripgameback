@@ -26,7 +26,8 @@ class TripList(APIView):
             if isinstance(trip, str):
                 return JsonResponse(trip, status=status.HTTP_400_BAD_REQUEST, safe=False)
             else:
-                Point.calculate_points_by_trip_kms(trip.kms)
+                trip_points_calculated = Point.calculate_points_by_trip_kms(trip.kms)
+                trip.points = trip.points + trip_points_calculated
                 serializer = TripDetailSerializer(trip)
                 return JsonResponse(serializer.data, status=status.HTTP_201_CREATED, safe=False)
         else:

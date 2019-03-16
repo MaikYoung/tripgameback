@@ -27,6 +27,9 @@ class PointsUserDetail(APIView):
         if total_points != point.points:
             point.points = total_points
         point.points = point.points + user.points
+        trip_level = Point.calculate_user_trip_level_by_user_points(point.points)
+        user.trip_level = trip_level
+        user.save()
         point.save()
         serializer = PointDetailSerializer(point)
         return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
