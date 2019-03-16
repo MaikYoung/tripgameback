@@ -1,11 +1,9 @@
-import ast
-import datetime
-import json
+
 
 from rest_framework import serializers
 from rest_framework.generics import get_object_or_404
 
-from project.settings import LEVELS, geolocator
+from project.settings import LEVELS
 from trips.models import Trip
 from trips.validators import validate_date_start, validate_date_end, validate_from_to
 from users.models import User
@@ -16,7 +14,7 @@ class TripSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Trip
-        fields = ('id', 'pictures', 'kms', 'user')
+        fields = ('id', 'pictures', 'kms', 'user', 'verified')
 
     @staticmethod
     def get_user(obj):
@@ -28,12 +26,13 @@ class TripDetailSerializer(serializers.ModelSerializer):
     trip_mates = serializers.SerializerMethodField()
     owner = serializers.SerializerMethodField()
     pictures = serializers.SerializerMethodField()
+    verified_by = serializers.SerializerMethodField()
 
     class Meta:
         model = Trip
         fields = (
-            'id', 'owner', 'from_to', 'destiny', 'date_start', 'date_end', 'pictures', 'verified', 'kms', 'route', 'trip_mates', 'views',
-            'counter_verified',
+            'id', 'owner', 'from_to', 'destiny', 'date_start', 'date_end', 'pictures', 'verified', 'kms', 'route',
+            'trip_mates', 'views', 'verified_by',
         )
 
     @staticmethod
@@ -43,10 +42,22 @@ class TripDetailSerializer(serializers.ModelSerializer):
             for mate in obj.mates:
                 user = get_object_or_404(User.objects.all(), id=mate)
                 trip_mates.append(
-                    {'user_id': user.id, 'username': user.username, 'trip_level': LEVELS[int(user.trip_level)][1]}
+                    {'id': user.id, 'username': user.username, 'trip_level': LEVELS[int(user.trip_level)][1]}
                 )
             return trip_mates
         return trip_mates
+
+    @staticmethod
+    def get_verified_by(obj):
+        verified_by = []
+        if len(obj.verified_by) > 0:
+            for usr in obj.verified_by:
+                user = get_object_or_404(User.objects.all(), id=usr)
+                verified_by.append(
+                    {'id': user.id, 'username': user.username, 'trip_level': LEVELS[int(user.trip_level)][1]}
+                )
+            return verified_by
+        return verified_by
 
     @staticmethod
     def get_owner(obj):

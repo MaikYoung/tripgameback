@@ -20,4 +20,5 @@ class User(AbstractUser):
     profile_pic = models.URLField(blank=True, null=True)
     following = ArrayField(models.IntegerField(), default=list)
     followers = ArrayField(models.IntegerField(), default=list)
+    points = models.IntegerField(default=0)
 

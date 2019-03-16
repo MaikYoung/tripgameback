@@ -7,6 +7,7 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.views import APIView
 
 from notifications.models import Notification
+from points.models import Point
 from trips.models import Trip
 from trips.serializers import TripSerializer, TripDetailSerializer, CreateTripSerializer
 from users.models import User
@@ -25,6 +26,7 @@ class TripList(APIView):
             if isinstance(trip, str):
                 return JsonResponse(trip, status=status.HTTP_400_BAD_REQUEST, safe=False)
             else:
+                Point.calculate_points_by_trip_kms(trip.kms)
                 serializer = TripDetailSerializer(trip)
                 return JsonResponse(serializer.data, status=status.HTTP_201_CREATED, safe=False)
         else:
@@ -67,6 +69,7 @@ class AddTripMate(APIView):
             else:
                 trip.mates.append(trip_mate.id)
                 trip.save()
+                trip_mate.points = trip_mate.points + (trip.points / 2)
                 Notification.create_notification(
                     to_user=trip_mate, from_user=trip_owner.id, type='7', trip_related=trip.id
                 )
@@ -87,6 +90,7 @@ class DeleteTripMate(APIView):
         if trip_owner.id == trip.owner.id:
             if trip_mate.id in trip.mates:
                 trip.mates.remove(trip_mate.id)
+                trip_mate.points = trip_mate.points - (trip.points / 2)
                 trip.save()
                 serializer = TripDetailSerializer(trip)
                 return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
@@ -112,6 +116,7 @@ class UploadPictureTrip(APIView):
                 image = request.data.get('image', None)
                 if image is not None:
                     trip.pictures.append(image)
+                    trip.points = trip.points + 5
                     trip.save()
                     returned_trip = get_object_or_404(self.queryset, id=trip.id)
                     serializer = TripDetailSerializer(returned_trip)
@@ -138,6 +143,7 @@ class DeletePictureTrip(APIView):
                 for i, data in enumerate(trip.pictures):
                     if index == i:
                         trip.pictures.remove(data)
+                        trip.points = trip.points - 5
                         trip.save()
                         returned_trip = get_object_or_404(self.queryset, id=trip.id)
                         serializer = TripDetailSerializer(returned_trip)
@@ -145,3 +151,35 @@ class DeletePictureTrip(APIView):
         else:
             response = 'Not Authorized'
             return JsonResponse(response, status=status.HTTP_401_UNAUTHORIZED, safe=False)
+
+
+class VerifyTrip(APIView):
+    queryset = Trip.objects.all()
+
+    def post(self, request, pk):
+        trip = get_object_or_404(self.queryset, id=pk)
+        user = get_object_or_404(User.objects.all(), id=request.user.id)
+        if trip.owner.id == user.id:
+            response = 'Can\'t verify your own trip'
+            return JsonResponse(response, status=status.HTTP_401_UNAUTHORIZED, safe=False)
+        elif user.id in trip.mates:
+            response = 'Can\'t verify a trip if you are a mate'
+            return JsonResponse(response, status=status.HTTP_401_UNAUTHORIZED, safe=False)
+        else:
+            if user.id in trip.verified_by:
+                response = 'Can\'t verify a trip twice'
+                return JsonResponse(response, status=status.HTTP_401_UNAUTHORIZED, safe=False)
+            else:
+                if len(trip.verified_by) < 2:
+                    trip.verified_by.append(user.id)
+                    trip.verified = True if len(trip.verified_by) == 2 else False
+                    user.points = user.points + 5
+                    user.save()
+                    trip.save()
+                    returned_trip = get_object_or_404(self.queryset, id=trip.id)
+                    serializer = TripDetailSerializer(returned_trip)
+                    return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
+                else:
+                    response = 'Trip is already verified'
+                    return JsonResponse(response, status=status.HTTP_400_BAD_REQUEST, safe=False)
+
