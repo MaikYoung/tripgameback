@@ -114,6 +114,7 @@ class UploadPictureTrip(APIView):
                 image = request.data.get('image', None)
                 if image is not None:
                     trip.pictures.append(image)
+                    trip.points = trip.points + 5
                     trip.save()
                     returned_trip = get_object_or_404(self.queryset, id=trip.id)
                     serializer = TripDetailSerializer(returned_trip)
@@ -140,6 +141,7 @@ class DeletePictureTrip(APIView):
                 for i, data in enumerate(trip.pictures):
                     if index == i:
                         trip.pictures.remove(data)
+                        trip.points = trip.points - 5
                         trip.save()
                         returned_trip = get_object_or_404(self.queryset, id=trip.id)
                         serializer = TripDetailSerializer(returned_trip)
