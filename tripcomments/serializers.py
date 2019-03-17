@@ -1,5 +1,3 @@
-import datetime
-
 from rest_framework import serializers
 from rest_framework.generics import get_object_or_404
 
@@ -7,7 +5,7 @@ from tripcomments.models import TripComments
 from users.models import User
 
 
-class ListTripSerializer(serializers.ModelSerializer):
+class ListCommentByTripSerializer(serializers.ModelSerializer):
     publisher = serializers.SerializerMethodField()
     created_at = serializers.SerializerMethodField()
 
