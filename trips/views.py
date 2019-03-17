@@ -190,4 +190,3 @@ class VerifyTrip(APIView):
                 else:
                     response = 'Trip is already verified'
                     return JsonResponse(response, status=status.HTTP_400_BAD_REQUEST, safe=False)
-
