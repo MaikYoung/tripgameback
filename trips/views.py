@@ -72,7 +72,7 @@ class AddTripMate(APIView):
                 trip.save()
                 trip_mate.points = trip_mate.points + (trip.points / 2)
                 Notification.create_notification(
-                    to_user=trip_mate, from_user=trip_owner.id, type='7', trip_related=trip.id
+                    to_user=trip_mate, from_user=trip_owner.id, type='6', trip_related=trip.id
                 )
                 serializer = TripDetailSerializer(trip)
                 return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
@@ -177,7 +177,14 @@ class VerifyTrip(APIView):
                     user.points = user.points + 5
                     user.save()
                     trip.save()
+                    Notification.create_notification(
+                        to_user=trip.owner, from_user=user.id, type='3', trip_related=trip.id
+                    )
                     returned_trip = get_object_or_404(self.queryset, id=trip.id)
+                    if returned_trip.verified:
+                        Notification.create_notification(
+                            to_user=trip.owner, from_user=0, type='4', trip_related=trip.id
+                        )
                     serializer = TripDetailSerializer(returned_trip)
                     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
                 else:

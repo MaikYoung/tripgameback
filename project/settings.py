@@ -169,7 +169,7 @@ NOTIFICATION_TYPES = (
     ('2', 'upgrade_level'),
     ('3', 'trip_verification'),
     ('4', 'trusted_trip'),
-    ('5', 'fake_trip'),
+    ('5', 'fake_trip'), #TODO desarrollar fake trip
     ('6', 'added_to_trip')
 )
 

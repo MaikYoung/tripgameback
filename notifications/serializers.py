@@ -23,8 +23,11 @@ class NotificationSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_from_user(obj):
-        from_user = get_object_or_404(User.objects.all(), id=obj.from_user)
-        return {'id': from_user.id, 'username': from_user.username}
+        if obj.from_user != 0:
+            from_user = get_object_or_404(User.objects.all(), id=obj.from_user)
+            return {'id': from_user.id, 'username': from_user.username}
+        else:
+            return 0
 
     @staticmethod
     def get_to_user(obj):
