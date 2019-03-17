@@ -9,4 +9,5 @@ urlpatterns = [
     path('api/', include('notifications.urls')),
     path('api/', include('trips.urls')),
     path('api/', include('points.urls')),
+    path('api/', include('tripcomments.urls')),
 ]
