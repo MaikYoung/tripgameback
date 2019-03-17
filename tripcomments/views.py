@@ -3,6 +3,7 @@ from rest_framework import status
 from rest_framework.generics import get_object_or_404
 from rest_framework.views import APIView
 
+from notifications.models import Notification
 from tripcomments.models import TripComments
 from tripcomments.serializers import ListCommentByTripSerializer
 from trips.models import Trip
@@ -31,6 +32,9 @@ class CreateUpdateComment(APIView):
         )
         if result:
             comments = TripComments.objects.filter(trip=pk)
+            Notification.create_notification(
+                from_user=user.id, to_user=trip.owner, trip_related=trip.id, type='1'
+            )
             if comments:
                 serializer = ListCommentByTripSerializer(comments, many=True)
                 return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)

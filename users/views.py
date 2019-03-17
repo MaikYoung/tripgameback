@@ -103,7 +103,7 @@ class UserAddFollowing(APIView):
         if add_following and add_follower:
             response = True
             # notification to target user new follower
-            Notification.create_notification(to_user=target_user, from_user=request.user.id, type='1')
+            Notification.create_notification(to_user=target_user, from_user=request.user.id, type='0')
             return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
         else:
             return JsonResponse(status=status.HTTP_400_BAD_REQUEST)

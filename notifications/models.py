@@ -7,7 +7,7 @@ from users.models import User
 
 class Notification(models.Model):
     to_user = models.ForeignKey(User, on_delete=models.CASCADE)
-    from_user = models.IntegerField()
+    from_user = models.IntegerField(default=None)
     type = models.CharField(choices=NOTIFICATION_TYPES, max_length=1)
     trip_related = models.IntegerField(default=None, null=True)
     active = models.BooleanField(default=True)
