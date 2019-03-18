@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from rest_framework.generics import get_object_or_404
+
 from users.models import User
 
 
@@ -9,12 +11,39 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserDetailSerializer(serializers.ModelSerializer):
+    followers = serializers.SerializerMethodField()
+    following = serializers.SerializerMethodField()
+    
     class Meta:
         model = User
         fields = (
             'id', 'username', 'first_name', 'last_name', 'trip_level', 'based_on', 'description',
             'birthday', 'profile_pic', 'followers', 'following'
         )
+
+    @staticmethod
+    def get_followers(obj):
+        if len(obj.followers) > 0:
+            followers_list = []
+            for follower in obj.followers:
+                user = get_object_or_404(User.objects.all(), id=follower)
+                followers_list.append(
+                    {'id': user.id, 'username': user.username, 'profile_pic': user.profile_pic}
+                )
+            return followers_list
+        return []
+
+    @staticmethod
+    def get_following(obj):
+        if len(obj.following) > 0:
+            following_list = []
+            for follow in obj.following:
+                user = get_object_or_404(User.objects.all(), id=follow)
+                following_list.append(
+                    {'id': user.id, 'username': user.username, 'profile_pic': user.profile_pic}
+                )
+            return following_list
+        return []
 
 
 class UserCreateSerializer(serializers.Serializer):
