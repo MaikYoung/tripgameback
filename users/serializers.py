@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from rest_framework.generics import get_object_or_404
+
 from users.models import User
 
 
@@ -9,12 +11,27 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserDetailSerializer(serializers.ModelSerializer):
+    followers = serializers.SerializerMethodField()
+    following = serializers.SerializerMethodField()
+
     class Meta:
         model = User
         fields = (
             'id', 'username', 'first_name', 'last_name', 'trip_level', 'based_on', 'description',
             'birthday', 'profile_pic', 'followers', 'following'
         )
+
+    @staticmethod
+    def get_followers(obj):
+        if len(obj.followers) == 0:
+            return 0
+        return len(obj.followers)
+
+    @staticmethod
+    def get_following(obj):
+        if len(obj.following) == 0:
+            return 0
+        return len(obj.following)
 
 
 class UserCreateSerializer(serializers.Serializer):
@@ -67,3 +84,32 @@ class UserFollowersSerializer(serializers.Serializer):
         instance.followers = validated_data.get('followers', instance.followers)
         instance.save()
         return instance
+
+
+class FollowerListSerializer(serializers.Serializer):
+    followers = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = 'followers'
+
+    @staticmethod
+    def get_followers(obj):
+        if obj:
+            user = get_object_or_404(User.objects.all(), id=obj)
+            return {'id': user.id, 'username': user.username, 'profile_pic': user.profile_pic}
+
+
+class FollowingListSerializer(serializers.Serializer):
+    following = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = 'following'
+
+    @staticmethod
+    def get_following(obj):
+        if obj:
+            user = get_object_or_404(User.objects.all(), id=obj)
+            return {'id': user.id, 'username': user.username, 'profile_pic': user.profile_pic}
+

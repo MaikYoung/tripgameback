@@ -1,9 +1,8 @@
-
-
-
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.http import JsonResponse
 from rest_framework import status
-from rest_framework.generics import get_object_or_404
+from rest_framework.generics import get_object_or_404, ListAPIView
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.views import APIView
 
 from notifications.models import Notification
@@ -13,12 +12,13 @@ from trips.serializers import TripSerializer, TripDetailSerializer, CreateTripSe
 from users.models import User
 
 
-class TripList(APIView):
-    def get(self, request):
-        trips = Trip.objects.all().order_by('-create_at')
-        serializer = TripSerializer(trips, many=True)
-        return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
+class TripListPaginated(ListAPIView):
+    queryset = Trip.objects.all().order_by('create_at')
+    serializer_class = TripSerializer
+    pagination_class = PageNumberPagination
 
+
+class TripCreate(APIView):
     def post(self, request):
         user = get_object_or_404(User.objects.all(), id=request.user.id)
         if user and user.id == request.data.get('owner', None):

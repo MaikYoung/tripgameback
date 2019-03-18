@@ -1,12 +1,13 @@
 from django.http import JsonResponse
 from rest_framework import status
-from rest_framework.generics import get_object_or_404
+from rest_framework.generics import get_object_or_404, ListAPIView
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.views import APIView
 
 from notifications.models import Notification
 from users.models import User
 from users.serializers import UserSerializer, UserDetailSerializer, UserCreateSerializer, \
-    UserUploadProfilePicSerializer
+    UserUploadProfilePicSerializer, FollowerListSerializer, FollowingListSerializer
 
 
 class ListUsers(APIView):
@@ -165,3 +166,21 @@ class UserDeleteFollower(APIView):
             else:
                 response = 'User is not in the follower list'
                 return JsonResponse(data=response, status=status.HTTP_400_BAD_REQUEST, safe=False)
+
+
+class ListFollowersByUser(ListAPIView):
+    serializer_class = FollowerListSerializer
+    pagination_class = PageNumberPagination
+
+    def get_queryset(self):
+        user = get_object_or_404(User.objects.all(), id=self.request.user.id)
+        return user.followers
+
+
+class ListFollowingByUser(ListAPIView):
+    serializer_class = FollowingListSerializer
+    pagination_class = PageNumberPagination
+
+    def get_queryset(self):
+        user = get_object_or_404(User.objects.all(), id=self.request.user.id)
+        return user.following
