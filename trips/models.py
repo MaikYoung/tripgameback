@@ -55,7 +55,7 @@ class Trip(models.Model):
             from_to=trip.from_to, destiny=trip.destiny
         )
         trip.route = obj.get('route', None)
-        trip.type = obj.get('type', None)
+        trip.trip_type = obj.get('type', None)
         trip.verified = False
         trip.counter_verified = 0
         trip.views = 0

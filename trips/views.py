@@ -191,3 +191,34 @@ class VerifyTrip(APIView):
                 else:
                     response = 'Trip is already verified'
                     return JsonResponse(response, status=status.HTTP_400_BAD_REQUEST, safe=False)
+
+
+class LikeTrip(APIView):
+    queryset = Trip.objects.all()
+
+    def post(self, request, pk):
+        trip = get_object_or_404(self.queryset, id=pk)
+        user = get_object_or_404(User.objects.all(), id=request.user.id)
+        if user.id in trip.likes:
+            response = 'Trip already liked'
+            return JsonResponse(response, status=status.HTTP_400_BAD_REQUEST, safe=False)
+        else:
+            trip.likes.append(user.id)
+            trip.save()
+            Notification.create_notification(from_user=user.id, trip_related=trip.id, to_user=trip.owner, type='7')
+            return JsonResponse(len(trip.likes), status=status.HTTP_200_OK, safe=False)
+
+
+class UnLikeTrip(APIView):
+    queryset = Trip.objects.all()
+
+    def post(self, request, pk):
+        trip = get_object_or_404(self.queryset, id=pk)
+        user = get_object_or_404(User.objects.all(), id=request.user.id)
+        if user.id in trip.likes:
+            trip.likes.remove(user.id)
+            trip.save()
+            return JsonResponse(len(trip.likes), status=status.HTTP_200_OK, safe=False)
+        else:
+            response = 'Trip is not liked'
+            return JsonResponse(response, status=status.HTTP_400_BAD_REQUEST, safe=False)

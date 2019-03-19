@@ -3,7 +3,7 @@
 from rest_framework import serializers
 from rest_framework.generics import get_object_or_404
 
-from project.settings import LEVELS
+from project.settings import LEVELS, TRIP_TYPES
 from trips.models import Trip
 from trips.validators import validate_date_start, validate_date_end, validate_from_to
 from users.models import User
@@ -11,15 +11,20 @@ from users.models import User
 
 class TripSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()
+    likes = serializers.SerializerMethodField()
 
     class Meta:
         model = Trip
-        fields = ('id', 'pictures', 'kms', 'user', 'verified')
+        fields = ('id', 'pictures', 'kms', 'user', 'verified', 'likes')
 
     @staticmethod
     def get_user(obj):
         user = get_object_or_404(User.objects.all(), id=obj.owner.id)
         return {'id': user.pk, 'username': user.username, 'trip_level': LEVELS[int(user.trip_level)][1]}
+
+    @staticmethod
+    def get_likes(obj):
+        return len(obj.likes)
 
 
 class TripDetailSerializer(serializers.ModelSerializer):
@@ -27,13 +32,23 @@ class TripDetailSerializer(serializers.ModelSerializer):
     owner = serializers.SerializerMethodField()
     pictures = serializers.SerializerMethodField()
     verified_by = serializers.SerializerMethodField()
+    type = serializers.SerializerMethodField()
+    likes = serializers.SerializerMethodField()
 
     class Meta:
         model = Trip
         fields = (
             'id', 'owner', 'from_to', 'destiny', 'date_start', 'date_end', 'pictures', 'verified', 'kms', 'route',
-            'trip_mates', 'views', 'verified_by',
+            'trip_mates', 'views', 'verified_by', 'likes', 'type'
         )
+
+    @staticmethod
+    def get_likes(obj):
+        return len(obj.likes)
+
+    @staticmethod
+    def get_type(obj):
+        return TRIP_TYPES[int(obj.trip_type)][1]
 
     @staticmethod
     def get_trip_mates(obj):
