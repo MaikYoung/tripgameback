@@ -22,14 +22,13 @@ class UsersList(ListAPIView):
 
 
 class CreateUsers(APIView):
-    """
-    Users List and Create Users
-    """
+    permission_classes = []
+
     def post(self, request):
         serializer = UserCreateSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
-            return JsonResponse(serializer.data, status=status.HTTP_201_CREATED, safe=False)
+            return JsonResponse(serializer.validated_data, status=status.HTTP_201_CREATED, safe=False)
         else:
             return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST, safe=False)
 
