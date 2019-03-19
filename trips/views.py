@@ -222,3 +222,19 @@ class UnLikeTrip(APIView):
         else:
             response = 'Trip is not liked'
             return JsonResponse(response, status=status.HTTP_400_BAD_REQUEST, safe=False)
+
+
+class ReportTrip(APIView):
+    queryset = Trip.objects.all()
+
+    def post(self, request, pk):
+        trip = get_object_or_404(self.queryset, id=pk)
+        user = get_object_or_404(User.objects.all(), id=request.user.id)
+        if user:
+            trip.reported_level = 1
+            trip.save()
+            Notification.create_notification(
+                to_user=trip.owner, from_user=0, type='5', trip_related=trip.id
+            )
+            response = 'Trip under investigation system'
+            return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
