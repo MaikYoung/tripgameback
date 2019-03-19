@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'trips',
     'points',
     'tripcomments',
+    'medals'
 ]
 
 MIDDLEWARE = [
@@ -171,9 +172,29 @@ NOTIFICATION_TYPES = (
     ('2', 'upgrade_level'),
     ('3', 'trip_verification'),
     ('4', 'trusted_trip'),
-    ('5', 'fake_trip'), #Por ahora no desarrollado
-    ('6', 'added_to_trip')
+    ('5', 'fake_trip_under_investigation'),
+    ('6', 'added_to_trip'),
+    ('7', 'like_trip')
 )
+
+REPORT_LEVELS = (
+    ('0', 'None'),
+    ('1', 'Investigated'),
+    ('2', 'Reported'),
+)
+
+TRIP_TYPES = (
+    ('0', 'Ski & Snow'),
+    ('1', 'Trekking'),
+    ('2', 'Cultural'),
+    ('3', 'Beach'),
+    ('4', 'Party'),
+    ('5', 'Festival'),
+    ('6', 'Surf'),
+    ('7', 'None'),
+    ('8', 'Gastronomic'),
+)
+
 
 
 #Geolocator

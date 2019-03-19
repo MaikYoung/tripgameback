@@ -5,6 +5,7 @@ from rest_framework.generics import get_object_or_404, ListAPIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.views import APIView
 
+from medals.models import Medals
 from notifications.models import Notification
 from points.models import Point
 from trips.models import Trip
@@ -21,18 +22,14 @@ class TripListPaginated(ListAPIView):
 class TripCreate(APIView):
     def post(self, request):
         user = get_object_or_404(User.objects.all(), id=request.user.id)
-        if user and user.id == request.data.get('owner', None):
-            trip = Trip.create_trip(obj=request.data, user=user)
-            if isinstance(trip, str):
-                return JsonResponse(trip, status=status.HTTP_400_BAD_REQUEST, safe=False)
-            else:
-                trip_points_calculated = Point.calculate_points_by_trip_kms(trip.kms)
-                trip.points = trip.points + trip_points_calculated
-                serializer = TripDetailSerializer(trip)
-                return JsonResponse(serializer.data, status=status.HTTP_201_CREATED, safe=False)
+        trip = Trip.create_trip(obj=request.data, user=user)
+        if isinstance(trip, str):
+            return JsonResponse(trip, status=status.HTTP_400_BAD_REQUEST, safe=False)
         else:
-            response = 'User request is not owner'
-            return JsonResponse(response, status=status.HTTP_400_BAD_REQUEST, safe=False)
+            trip_points_calculated = Point.calculate_points_by_trip_kms(trip.kms)
+            trip.points = trip.points + trip_points_calculated
+            serializer = TripDetailSerializer(trip)
+            return JsonResponse(serializer.data, status=status.HTTP_201_CREATED, safe=False)
 
 
 class TripDetail(APIView):
@@ -191,3 +188,50 @@ class VerifyTrip(APIView):
                 else:
                     response = 'Trip is already verified'
                     return JsonResponse(response, status=status.HTTP_400_BAD_REQUEST, safe=False)
+
+
+class LikeTrip(APIView):
+    queryset = Trip.objects.all()
+
+    def post(self, request, pk):
+        trip = get_object_or_404(self.queryset, id=pk)
+        user = get_object_or_404(User.objects.all(), id=request.user.id)
+        if user.id in trip.likes:
+            response = 'Trip already liked'
+            return JsonResponse(response, status=status.HTTP_400_BAD_REQUEST, safe=False)
+        else:
+            trip.likes.append(user.id)
+            trip.save()
+            Notification.create_notification(from_user=user.id, trip_related=trip.id, to_user=trip.owner, type='7')
+            return JsonResponse(len(trip.likes), status=status.HTTP_200_OK, safe=False)
+
+
+class UnLikeTrip(APIView):
+    queryset = Trip.objects.all()
+
+    def post(self, request, pk):
+        trip = get_object_or_404(self.queryset, id=pk)
+        user = get_object_or_404(User.objects.all(), id=request.user.id)
+        if user.id in trip.likes:
+            trip.likes.remove(user.id)
+            trip.save()
+            return JsonResponse(len(trip.likes), status=status.HTTP_200_OK, safe=False)
+        else:
+            response = 'Trip is not liked'
+            return JsonResponse(response, status=status.HTTP_400_BAD_REQUEST, safe=False)
+
+
+class ReportTrip(APIView):
+    queryset = Trip.objects.all()
+
+    def post(self, request, pk):
+        trip = get_object_or_404(self.queryset, id=pk)
+        user = get_object_or_404(User.objects.all(), id=request.user.id)
+        if user:
+            trip.reported_level = 1
+            trip.save()
+            Notification.create_notification(
+                to_user=trip.owner, from_user=0, type='5', trip_related=trip.id
+            )
+            response = 'Trip under investigation system'
+            return JsonResponse(response, status=status.HTTP_200_OK, safe=False)

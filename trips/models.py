@@ -3,7 +3,7 @@ from django.db import models
 from geopy.distance import geodesic
 from rest_framework.generics import get_object_or_404
 
-from project.settings import geolocator
+from project.settings import geolocator, TRIP_TYPES
 from trips.validators import validate_date_start, validate_date_end, validate_from_to, validate_destiny
 from users.models import User
 
@@ -23,9 +23,12 @@ class Trip(models.Model):
     date_start = models.DateField(null=True)
     date_end = models.DateField(null=True)
     create_at = models.DateTimeField(auto_now=True)
+    likes = ArrayField(models.IntegerField(), default=list)
+    reported_level = models.IntegerField(default=0)
+    trip_type = models.CharField(choices=TRIP_TYPES, max_length=1, null=True)
 
     @staticmethod
-    def create_trip(obj , user):
+    def create_trip(obj, user):
         trip = Trip()
         trip.owner = user
         date_start = validate_date_start(obj.get('date_start'))
@@ -51,7 +54,8 @@ class Trip(models.Model):
         trip.kms = Trip.calculate_kms_between_cities(
             from_to=trip.from_to, destiny=trip.destiny
         )
-        trip.route = obj.get('route')
+        trip.route = obj.get('route', None)
+        trip.trip_type = obj.get('type', None)
         trip.verified = False
         trip.counter_verified = 0
         trip.views = 0

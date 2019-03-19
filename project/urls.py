@@ -10,4 +10,5 @@ urlpatterns = [
     path('api/', include('trips.urls')),
     path('api/', include('points.urls')),
     path('api/', include('tripcomments.urls')),
+    path('api/', include('medals.urls')),
 ]
