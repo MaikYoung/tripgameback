@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from rest_framework.generics import get_object_or_404
 
+from medals.models import Medals
 from points.models import Point
 from users.models import User
 
@@ -43,7 +44,6 @@ class UserDetailSerializer(serializers.ModelSerializer):
 
 
 class UserCreateSerializer(serializers.Serializer):
-    id = serializers.IntegerField(read_only=True)
     first_name = serializers.CharField(max_length=100)
     last_name = serializers.CharField(max_length=100)
     email = serializers.EmailField()
@@ -59,6 +59,8 @@ class UserCreateSerializer(serializers.Serializer):
         user = User.objects.create(**validated_data)
         user.set_password(user.password)
         user.save()
+        Point.create_point_by_user(owner=user)
+        Medals.create_medals(user=user)
         return user
 
     def update(self, instance, validated_data):
