@@ -5,6 +5,7 @@ from rest_framework.generics import get_object_or_404, ListAPIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.views import APIView
 
+from medals.models import Medals
 from notifications.models import Notification
 from points.models import Point
 from trips.models import Trip
@@ -21,18 +22,14 @@ class TripListPaginated(ListAPIView):
 class TripCreate(APIView):
     def post(self, request):
         user = get_object_or_404(User.objects.all(), id=request.user.id)
-        if user and user.id == request.data.get('owner', None):
-            trip = Trip.create_trip(obj=request.data, user=user)
-            if isinstance(trip, str):
-                return JsonResponse(trip, status=status.HTTP_400_BAD_REQUEST, safe=False)
-            else:
-                trip_points_calculated = Point.calculate_points_by_trip_kms(trip.kms)
-                trip.points = trip.points + trip_points_calculated
-                serializer = TripDetailSerializer(trip)
-                return JsonResponse(serializer.data, status=status.HTTP_201_CREATED, safe=False)
+        trip = Trip.create_trip(obj=request.data, user=user)
+        if isinstance(trip, str):
+            return JsonResponse(trip, status=status.HTTP_400_BAD_REQUEST, safe=False)
         else:
-            response = 'User request is not owner'
-            return JsonResponse(response, status=status.HTTP_400_BAD_REQUEST, safe=False)
+            trip_points_calculated = Point.calculate_points_by_trip_kms(trip.kms)
+            trip.points = trip.points + trip_points_calculated
+            serializer = TripDetailSerializer(trip)
+            return JsonResponse(serializer.data, status=status.HTTP_201_CREATED, safe=False)
 
 
 class TripDetail(APIView):

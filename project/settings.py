@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'trips',
     'points',
     'tripcomments',
+    'medals'
 ]
 
 MIDDLEWARE = [
@@ -190,7 +191,8 @@ TRIP_TYPES = (
     ('4', 'Party'),
     ('5', 'Festival'),
     ('6', 'Surf'),
-    ('7', 'None')
+    ('7', 'None'),
+    ('8', 'Gastronomic'),
 )
 
 
