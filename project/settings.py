@@ -175,6 +175,12 @@ NOTIFICATION_TYPES = (
     ('6', 'added_to_trip')
 )
 
+REPORT_LEVELS = (
+    ('0', 'None'),
+    ('1', 'Investigated'),
+    ('2', 'Reported'),
+)
+
 
 #Geolocator
 geolocator = Nominatim(user_agent="travlin")
