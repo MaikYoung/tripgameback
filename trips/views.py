@@ -41,7 +41,8 @@ class TripDetail(APIView):
     def get(self, request, pk):
         trip = get_object_or_404(queryset=self.queryset, id=pk)
         serializer = TripDetailSerializer(trip)
-        Trip.new_visit(trip=trip)
+        if trip.owner != request.user.id:
+            Trip.new_visit(trip=trip)
         return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
     def put(self, request, pk):
