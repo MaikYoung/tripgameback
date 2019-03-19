@@ -10,15 +10,21 @@ from users.serializers import UserSerializer, UserDetailSerializer, UserCreateSe
     UserUploadProfilePicSerializer, FollowerListSerializer, FollowingListSerializer
 
 
-class ListUsers(APIView):
+class UsersList(ListAPIView):
+    serializer_class = UserSerializer
+
+    def get_queryset(self):
+        username = self.request.GET.get('username', None)
+        if username is not None:
+            return User.objects.filter(username=username).order_by('username')
+        else:
+            return User.objects.all().order_by('trip_level')
+
+
+class CreateUsers(APIView):
     """
     Users List and Create Users
     """
-    def get(self, request):
-        users = User.objects.all()
-        serializer = UserSerializer(users, many=True)
-        return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
-
     def post(self, request):
         serializer = UserCreateSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):

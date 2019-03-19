@@ -1,11 +1,12 @@
 from django.urls import path, include
 
 
-from users.views import ListUsers, DetailUser, UploadProfilePic, UserAddFollowing, UserDeleteFollowing, \
-    UserDeleteFollower, ListFollowersByUser, ListFollowingByUser
+from users.views import CreateUsers, DetailUser, UploadProfilePic, UserAddFollowing, UserDeleteFollowing, \
+    UserDeleteFollower, ListFollowersByUser, ListFollowingByUser, UsersList
 
 urlpatterns = [
-    path(r'v1/users', ListUsers.as_view()),
+    path(r'v1/users', UsersList.as_view()),
+    path(r'v1/usercreate', CreateUsers.as_view()),
     path(r'v1/user/<int:pk>', DetailUser.as_view()),
     path(r'v1/user/followers', ListFollowersByUser.as_view()),
     path(r'v1/user/following', ListFollowingByUser.as_view()),

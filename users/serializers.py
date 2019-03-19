@@ -1,13 +1,21 @@
 from rest_framework import serializers
 from rest_framework.generics import get_object_or_404
 
+from points.models import Point
 from users.models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
+    kms = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = ('id', 'username', 'trip_level', 'based_on', 'profile_pic')
+        fields = ('id', 'username', 'trip_level', 'kms', 'profile_pic')
+
+    @staticmethod
+    def get_kms(obj):
+        points = get_object_or_404(Point.objects.all(), owner=obj.id)
+        return points.total_kms
 
 
 class UserDetailSerializer(serializers.ModelSerializer):
