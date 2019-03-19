@@ -18,7 +18,7 @@ class UsersList(ListAPIView):
         if username is not None:
             return User.objects.filter(username=username).order_by('username')
         else:
-            return User.objects.all().order_by('trip_level')
+            return User.objects.all().order_by('-trip_level')
 
 
 class CreateUsers(APIView):
