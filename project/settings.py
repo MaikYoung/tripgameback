@@ -181,6 +181,18 @@ REPORT_LEVELS = (
     ('2', 'Reported'),
 )
 
+TRIP_TYPES = (
+    ('0', 'Ski & Snow'),
+    ('1', 'Trekking'),
+    ('2', 'Cultural'),
+    ('3', 'Beach'),
+    ('4', 'Party'),
+    ('5', 'Festival'),
+    ('6', 'Surf'),
+    ('7', 'None')
+)
+
+
 
 #Geolocator
 geolocator = Nominatim(user_agent="travlin")
