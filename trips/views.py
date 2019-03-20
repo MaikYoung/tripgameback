@@ -52,9 +52,6 @@ class TripDetail(APIView):
             serializer.save()
             returned_serializer = TripDetailSerializer(serializer.instance)
             return JsonResponse(returned_serializer.data, status=status.HTTP_200_OK, safe=False)
-        else:
-            #TODO: resolver la devolucion de errores!
-            return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST, safe=False)
 
 
 class AddTripMate(APIView):

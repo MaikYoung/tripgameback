@@ -44,25 +44,28 @@ class DetailUser(APIView):
         serializer = UserDetailSerializer(user)
         return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
-    def put(self, request):
-        user = get_object_or_404(queryset=self.queryset, id=request.user.id)
-        serializer = UserCreateSerializer(instance=user, data=request.data, partial=True)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return JsonResponse({'id': serializer.data.get('id')},  status=status.HTTP_200_OK, safe=False)
+    def put(self, request, pk):
+        if request.user.id == pk:
+            user = get_object_or_404(queryset=self.queryset, id=request.user.id)
+            serializer = UserCreateSerializer(instance=user, data=request.data, partial=True)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                return JsonResponse({'id': serializer.data.get('id')},  status=status.HTTP_200_OK, safe=False)
+            else:
+                return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST, safe=False)
         else:
-            return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST, safe=False)
+            response = 'Not Authorized'
+            return JsonResponse(response, status=status.HTTP_400_BAD_REQUEST, safe=False)
 
-    def delete(self, request):
-        # TODO: Mirar por que 'ConnectionResetError: [Errno 104] Connection reset by peer' despues de borrar un user
-        if request.user.is_superuser:
+    def delete(self, request, pk):
+        if request.user.id == pk:
             user = get_object_or_404(queryset=self.queryset, id=request.user.id)
             user.delete()
             response = 'User deleted correctly'
             return JsonResponse(response, status=status.HTTP_204_NO_CONTENT, safe=False)
         else:
             response = 'Not Authorized'
-            return JsonResponse(response, status=status.HTTP_403_FORBIDDEN, safe=False)
+            return JsonResponse(response, status=status.HTTP_400_BAD_REQUEST, safe=False)
 
 
 class UploadProfilePic(APIView):
