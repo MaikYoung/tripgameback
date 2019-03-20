@@ -48,7 +48,7 @@ class TripDetail(APIView):
     def put(self, request, pk):
         trip = get_object_or_404(queryset=self.queryset, id=pk)
         serializer = CreateTripSerializer(instance=trip, data=request.data, partial=True)
-        if serializer.is_valid():
+        if serializer.is_valid(raise_exception=True):
             serializer.save()
             returned_serializer = TripDetailSerializer(serializer.instance)
             return JsonResponse(returned_serializer.data, status=status.HTTP_200_OK, safe=False)

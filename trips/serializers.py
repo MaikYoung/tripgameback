@@ -3,6 +3,7 @@
 from rest_framework import serializers
 from rest_framework.generics import get_object_or_404
 
+from points.models import Point
 from project.settings import LEVELS, TRIP_TYPES
 from trips.models import Trip
 from trips.validators import validate_date_start, validate_date_end, validate_from_to
@@ -59,7 +60,7 @@ class TripDetailSerializer(serializers.ModelSerializer):
         model = Trip
         fields = (
             'id', 'owner', 'from_to', 'destiny', 'date_start', 'date_end', 'pictures', 'verified', 'kms', 'route',
-            'trip_mates', 'views', 'verified_by', 'likes', 'type'
+            'trip_mates', 'views', 'verified_by', 'likes', 'type', 'points'
         )
 
     @staticmethod
@@ -120,27 +121,31 @@ class CreateTripSerializer(serializers.Serializer):
         if request_date_start is not None:
             validate = validate_date_start(str(request_date_start))
             if validate == 'error':
-                return 'Can\'t publish trips older than 2 years'
+                raise serializers.ValidationError('Can\'t publish trips older than 2 years')
             instance.date_start = validated_data.get('date_start', instance.date_start)
         request_date_end = validated_data.get('date_end', None)
         if request_date_end is not None:
             validate = validate_date_end(date_start=str(instance.date_start), date_end=str(request_date_end))
             if validate == 'error':
-                return 'Date start can\'t be greater that Date end'
+                raise serializers.ValidationError('Date start can\'t be greater that Date end')
             instance.date_end = validated_data.get('date_end', instance.date_end)
         request_from_to = validated_data.get('from_to', None)
         if request_from_to is not None:
             validate = validate_from_to(request_from_to)
             if validate == 'error':
-                return 'City from_to can\'t be found'
+                raise serializers.ValidationError('City from_to can\'t be found')
             instance.from_to = validated_data.get('from_to', instance.from_to)
         request_destiny = validated_data.get('destiny', None)
-        if request_from_to is not None:
+        if request_destiny is not None:
             validate = validate_from_to(request_destiny)
             if validate == 'error':
-                return 'City destiny can\'t be found'
+                raise serializers.ValidationError('City destiny can\'t be found')
             instance.destiny = validated_data.get('destiny', instance.destiny)
         instance.route = validated_data.get('route', instance.route)
+        instance.kms = Trip.calculate_kms_between_cities(
+            from_to=instance.from_to, destiny=instance.destiny
+        )
+        instance.points = Point.calculate_points_by_trip_kms(instance.kms)
         instance.save()
         return instance
 
