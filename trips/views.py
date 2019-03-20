@@ -245,7 +245,7 @@ class TripsByUserFollowing(ListAPIView):
     serializer_class = TripSerializerPaginated
 
     def get_queryset(self):
-        user = get_object_or_404(User.objects.all(), id=self.request.user.id)
+        user = get_object_or_404(User, id=self.request.user.id)
         trip_list = []
         for follow in user.following:
             queryset = Trip.objects.filter(owner=follow)
@@ -264,3 +264,28 @@ class TripsByUserFollowing(ListAPIView):
                         }
                     )
         return sorted(trip_list, key=lambda item: item['create_at'])
+
+
+class TripsUserIsMate(ListAPIView):
+    pagination_class = PageNumberPagination
+    serializer_class = TripSerializerPaginated
+
+    def get_queryset(self):
+        user = get_object_or_404(User, id=self.request.user.id)
+        trips = get_list_or_404(Trip)
+        my_trips = []
+        for trip in trips:
+            if user.id in trip.mates:
+                my_trips.append(
+                    {
+                        'id': trip.id,
+                        'pictures': trip.pictures,
+                        'kms': trip.kms,
+                        'owner': trip.owner,
+                        'verified': trip.verified,
+                        'likes': trip.likes,
+                        'create_at': trip.create_at
+                    }
+                )
+        return sorted(my_trips, key=lambda item: item['create_at'])
+

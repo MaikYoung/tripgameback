@@ -1,7 +1,7 @@
 from django.urls import path
 
 from trips.views import TripListPaginated, TripDetail, AddTripMate, DeleteTripMate, UploadPictureTrip, \
-    DeletePictureTrip, VerifyTrip, TripCreate, LikeTrip, UnLikeTrip, ReportTrip, TripsByUserFollowing
+    DeletePictureTrip, VerifyTrip, TripCreate, LikeTrip, UnLikeTrip, ReportTrip, TripsByUserFollowing, TripsUserIsMate
 
 urlpatterns = [
     path('v1/trips', TripListPaginated.as_view()),
@@ -16,4 +16,5 @@ urlpatterns = [
     path('v1/trip/<int:pk>/unlike', UnLikeTrip.as_view()),
     path('v1/trip/<int:pk>/report', ReportTrip.as_view()),
     path('v1/trips_following', TripsByUserFollowing.as_view()),
+    path('v1/trips_user_is_mate', TripsUserIsMate.as_view()),
 ]
