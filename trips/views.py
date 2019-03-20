@@ -1,5 +1,8 @@
+from operator import itemgetter
+
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.http import JsonResponse
+from django.shortcuts import get_list_or_404
 from rest_framework import status
 from rest_framework.generics import get_object_or_404, ListAPIView
 from rest_framework.pagination import PageNumberPagination
@@ -9,7 +12,7 @@ from medals.models import Medals
 from notifications.models import Notification
 from points.models import Point
 from trips.models import Trip
-from trips.serializers import TripSerializer, TripDetailSerializer, CreateTripSerializer
+from trips.serializers import TripSerializer, TripDetailSerializer, CreateTripSerializer, TripSerializerPaginated
 from users.models import User
 
 
@@ -235,3 +238,29 @@ class ReportTrip(APIView):
             )
             response = 'Trip under investigation system'
             return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
+
+
+class TripsByUserFollowing(ListAPIView):
+    pagination_class = PageNumberPagination
+    serializer_class = TripSerializerPaginated
+
+    def get_queryset(self):
+        user = get_object_or_404(User.objects.all(), id=self.request.user.id)
+        trip_list = []
+        for follow in user.following:
+            queryset = Trip.objects.filter(owner=follow)
+            if queryset:
+                trips = get_list_or_404(Trip, owner=follow)
+                for trip in trips:
+                    trip_list.append(
+                        {
+                            'id': trip.id,
+                            'pictures': trip.pictures,
+                            'kms': trip.kms,
+                            'owner': trip.owner,
+                            'verified': trip.verified,
+                            'likes': trip.likes,
+                            'create_at': trip.create_at
+                        }
+                    )
+        return sorted(trip_list, key=lambda item: item['create_at'])

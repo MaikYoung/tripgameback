@@ -27,6 +27,26 @@ class TripSerializer(serializers.ModelSerializer):
         return len(obj.likes)
 
 
+class TripSerializerPaginated(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+    likes = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Trip
+        fields = ('id', 'pictures', 'kms', 'user', 'verified', 'likes')
+
+    @staticmethod
+    def get_user(obj):
+        owner = obj.get('owner', None)
+        user = get_object_or_404(User.objects.all(), id=owner.id)
+        return {'id': user.pk, 'username': user.username, 'trip_level': LEVELS[int(user.trip_level)][1]}
+
+    @staticmethod
+    def get_likes(obj):
+        likes = obj.get('likes', None)
+        return len(likes)
+
+
 class TripDetailSerializer(serializers.ModelSerializer):
     trip_mates = serializers.SerializerMethodField()
     owner = serializers.SerializerMethodField()
