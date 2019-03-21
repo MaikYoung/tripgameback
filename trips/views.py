@@ -53,6 +53,15 @@ class TripDetail(APIView):
             returned_serializer = TripDetailSerializer(serializer.instance)
             return JsonResponse(returned_serializer.data, status=status.HTTP_200_OK, safe=False)
 
+    def delete(self, request, pk):
+        trip = get_object_or_404(queryset=self.queryset, id=pk)
+        if request.user.id == trip.owner.id:
+            trip.delete()
+            response = 'Trip deleted correctly'
+            return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
+        else:
+            response = 'Not Authorized'
+            return JsonResponse(response, status=status.HTTP_401_UNAUTHORIZED, safe=False)
 
 class AddTripMate(APIView):
     queryset = User.objects.all()
