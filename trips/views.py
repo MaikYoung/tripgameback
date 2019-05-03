@@ -260,16 +260,21 @@ class TripsByUserFollowing(ListAPIView):
                 for trip in trips:
                     trip_list.append(
                         {
+                            'from_to': trip.from_to,
+                            'destiny': trip.destiny,
                             'id': trip.id,
-                            'pictures': trip.pictures,
                             'kms': trip.kms,
                             'owner': trip.owner,
+                            'views': trip.views,
                             'verified': trip.verified,
                             'likes': trip.likes,
-                            'create_at': trip.create_at
+                            'points': trip.points,
+                            'create_at': trip.create_at,
+                            'likes_ids': trip.likes
                         }
                     )
-        return sorted(trip_list, key=lambda item: item['create_at'])
+        sorted_list = sorted(trip_list, key=lambda item: item['create_at'])
+        return sorted_list
 
 
 class TripsUserIsMate(ListAPIView):

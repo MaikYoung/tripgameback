@@ -58,6 +58,7 @@ class UserCreateSerializer(serializers.Serializer):
     def create(self, validated_data):
         user = User.objects.create(**validated_data)
         user.set_password(user.password)
+        user.profile_pic = 'http://0.0.0.0:8000/uploads/generic_profile.jpg'
         user.save()
         Point.create_point_by_user(owner=user)
         Medals.create_medals(user=user)

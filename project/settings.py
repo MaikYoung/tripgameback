@@ -28,7 +28,7 @@ SECRET_KEY = '5l#c31j1aw4lrqg8&ts)uzs+fx-)-)q*c%l7%4pmts4u^f+fu4'
 DEBUG = True
 
 ALLOWED_HOSTS = ['0.0.0.0']
-
+CORS_ORIGIN_ALLOW_ALL = True
 
 # Application definition
 
@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     #thirdapps
     'rest_framework',
     'rest_framework.authtoken',
+    'corsheaders',
     #myapps
     'users',
     'notifications',
@@ -52,9 +53,10 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
+    #'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -139,7 +141,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
